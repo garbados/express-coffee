@@ -18,6 +18,10 @@ config = require "./config"
 app.configure 'production', 'development', 'testing', ->
 	config.setEnvironment app.settings.env
 
+# logging
+app.use(express.logger());
+app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+
 # db_config = "mongodb://#{config.DB_USER}:#{config.DB_PASS}@#{config.DB_HOST}:#{config.DB_PORT}/#{config.DB_NAME}"
 # mongoose.connect db_config
 if app.settings.env != 'production'
@@ -30,14 +34,15 @@ else
 app.use assets()
 # Set the public folder as static assets.
 app.use express.static(process.cwd() + '/public')
- 
+
+# i18n support
+app.use require './i18n'
 
 # Set View Engine.
 app.set 'view engine', 'jade'
 
 # [Body parser middleware](http://www.senchalabs.org/connect/middleware-bodyParser.html) parses JSON or XML bodies into `req.body` object
 app.use express.bodyParser()
-
 
 #### Finalization
 # Initialize routes
