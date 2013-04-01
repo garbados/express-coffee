@@ -1,0 +1,17 @@
+mixin create_payment(plan)
+  form(id="#{plan.id}-payment-form", action='api/v1/subscribe/#{plan.id}', method='POST')
+    script.stripe-button(src='https://checkout.stripe.com/v2/checkout.js', 
+                         data-key='#{STRIPE_KEY}', 
+                         data-amount='#{plan.amount}', 
+                         data-name='#{plan.name}', 
+                         data-description='#{plan.name} - $#{amount/100}/mo', 
+                         data-image='/checkout-128x128.png')
+
+script#create-payment-template(type="text/template")
+  form(id="{{id}}-new-payment-form", action='api/v1/subscribe/{{id}}', method='POST')
+    script.stripe-button(src='https://checkout.stripe.com/v2/checkout.js', 
+                         data-key='#{STRIPE_KEY}', 
+                         data-amount='{{amount}}', 
+                         data-name='{{name}}', 
+                         data-description='{{name}} - ${{amount/100}}/mo', 
+                         data-image='/checkout-128x128.png')

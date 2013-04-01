@@ -12,10 +12,15 @@ get_plans = (cb) ->
 # make stripe routes
 stripeify = (app, url_root = "api/v1") ->
 	get_plans (results) ->
-		# create to subscribe to each plan
+		app.get [url_root, 'plans'].join('/'), (req, res) ->
+			res.send results
 		for plan in results
 			do (plan) ->
-				app.post [url_root, 'payments', 'subscribe', plan].join '/', (req, res) ->
+				# get a specific plan
+				app.get [url_root, 'plans', plan.id].join('/'), (req, res) ->
+					res.send plan
+				# subscribe to a new plan or create a customer and subscribe it to a plan
+				app.post [url_root, 'subscribe', plan].join('/'), (req, res) ->
 					# don't allow subscriptions without authentication
 					if not req.isAuthenticated()
 						res.send
