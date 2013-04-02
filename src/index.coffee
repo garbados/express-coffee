@@ -3,6 +3,7 @@ express = require 'express'
 stylus = require 'stylus'
 assets = require 'connect-assets'
 mongoose = require 'mongoose'
+validator = require 'express-validator'
 
 #### Basic application initialization
 # Create app instance.
@@ -21,6 +22,9 @@ app.configure 'production', 'development', 'testing', ->
 # logging
 app.use(express.logger());
 app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+
+# string validation middleware
+app.use validator
 
 # db_config = "mongodb://#{config.DB_USER}:#{config.DB_PASS}@#{config.DB_HOST}:#{config.DB_PORT}/#{config.DB_NAME}"
 # mongoose.connect db_config

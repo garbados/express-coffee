@@ -1,7 +1,14 @@
 Stripe = require('stripe')(process.env.STRIPE_SECRET)
 User = require('../models/user')
 
-# get plans
+ensureAuthenticated = (req, res, next) ->
+	if not req.isAuthenticated()
+		res.send
+			error: "unauthenticated"
+	else
+		next()
+
+# get plans; only collects the first 100 because why would you have more than 4
 get_plans = (cb) ->
 	stripe.plans.list 100, 0, (e, result) ->
 		if e
@@ -19,13 +26,19 @@ stripeify = (app, url_root = "api/v1") ->
 				# get a specific plan
 				app.get [url_root, 'plans', plan.id].join('/'), (req, res) ->
 					res.send plan
+				# unsubscribe
+				app.delete [url_root, 'subscribe'].join('/'), (req, res) ->
+					ensureAuthenticated req, res, () ->
+						User.findById req.user._id, (user) ->
+							if user.stripe and user.stripe.customer
+								Stripe.customers.cancel_subscription user.stripe.customer.id, (e) ->
+									res.send e or 200
+							else
+								res.send "not a customer", 401
 				# subscribe to a new plan or create a customer and subscribe it to a plan
 				app.post [url_root, 'subscribe', plan].join('/'), (req, res) ->
 					# don't allow subscriptions without authentication
-					if not req.isAuthenticated()
-						res.send
-							error: "unauthenticated"
-					else
+					ensureAuthenticated req, res, () ->
 						User.findById req.user._id, (user) ->
 							# is the user a customer?
 							if user.stripe

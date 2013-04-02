@@ -14,6 +14,8 @@
     , "which": "1.0.5"
     , "mongoose": "3.5.3"
     , "wrench": "1.4.4"
+    , "passport-local": "0.1.6"
+    , "express-validator": "0.3.2"
   }, "scripts": {
     "install": "node node_modules/coffee-script/bin/cake build",
     "start": "node server.js",
